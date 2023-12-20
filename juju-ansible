@@ -75,7 +75,7 @@ def to_inventory_object(status):
 			result.setdefault(machine['series'], []).append(machine['dns-name'])
 
 	# Create groups for each service
-	for service_name, service in status.get('services', {}).items():
+	for service_name, service in status.get('applications', {}).items():
 		for unit_name, unit in service.get('units', {}).items():
 			if status.get('machines', {}).get(unit.get('machine'), {}).get('dns-name'):
 				result.setdefault(service_name, []).append(
