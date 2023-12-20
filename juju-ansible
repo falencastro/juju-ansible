@@ -73,6 +73,13 @@ def to_inventory_object(status):
 		result.setdefault('all', []).append(machine['dns-name'])
 		if machine.get('series'):
 			result.setdefault(machine['series'], []).append(machine['dns-name'])
+		if machine.get('containers'):
+			for container_num, container in machine.get('containers', {}).items():
+				if not container.get('dns-name'):
+					continue
+				result.setdefault('all', []).append(container['dns-name'])
+				if container.get('series'):
+					result.setdefault(container['series'], []).append(container['dns-name'])
 
 	# Create groups for each service
 	for service_name, service in status.get('applications', {}).items():
@@ -80,6 +87,9 @@ def to_inventory_object(status):
 			if status.get('machines', {}).get(unit.get('machine'), {}).get('dns-name'):
 				result.setdefault(service_name, []).append(
 					status['machines'][unit['machine']]['dns-name'])
+			elif status.get('machines', {}).get(unit.get('machine').split('/')[0]).get('containers', {}).get(unit.get('machine')).get('dns-name'):
+				result.setdefault(service_name, []).append(
+					status['machines'][unit['machine'].split('/')[0]]['containers'][unit['machine']]['dns-name'])
 
 	# Unique all the hosts, in case there are duplicates. Could happen,
 	# if multiple units are targeted to a machine.
